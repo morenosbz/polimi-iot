@@ -1,13 +1,13 @@
 <tos_image>
   <ident>
-    <platform>telosb</platform>
-    <uidhash>AAC720ABL</uidhash>
-    <appname>RadioCountToLed</appname>
-    <timestamp>5E6F2EE9L</timestamp>
-    <username>user</username>
-    <userhash>2C00343AL</userhash>
-    <deluge_support>no</deluge_support>
     <hostname>user-iot</hostname>
+    <username>user</username>
+    <deluge_support>no</deluge_support>
+    <timestamp>5E728C71L</timestamp>
+    <appname>RadioCountToLed</appname>
+    <platform>telosb</platform>
+    <uidhash>7AD2F0ACL</uidhash>
+    <userhash>2C00343AL</userhash>
   </ident>
   <image format="ihex">
 :104000005542200135D0085A8245641231400039AA

@@ -1,13 +1,13 @@
 <tos_image>
   <ident>
-    <userhash>2C00343AL</userhash>
-    <uidhash>CE618F4AL</uidhash>
-    <hostname>user-iot</hostname>
-    <appname>RadioCountToLed</appname>
-    <platform>micaz</platform>
-    <deluge_support>no</deluge_support>
-    <timestamp>5E72548DL</timestamp>
     <username>user</username>
+    <timestamp>5E728C76L</timestamp>
+    <deluge_support>no</deluge_support>
+    <platform>micaz</platform>
+    <hostname>user-iot</hostname>
+    <uidhash>2CE5FC1DL</uidhash>
+    <appname>RadioCountToLed</appname>
+    <userhash>2C00343AL</userhash>
   </ident>
   <image format="ihex">
 :100000000C9449000C94E2040C94EC040C94F60457
