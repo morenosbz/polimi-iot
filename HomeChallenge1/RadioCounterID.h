@@ -10,6 +10,7 @@
 
 typedef nx_struct radio_count_msg {
   nx_uint16_t counter;		// Counter value
+  nx_uint16_t senderID;		//new
 } radio_count_msg_t;
 
 enum {

@@ -22,10 +22,10 @@
 module RadioCounterIDC @safe() {
   uses {
 
-  	interface AMSend; 		// Sender Component
+    interface AMSend; 		// Sender Component
     interface Receive;		// Receiver Component
     
-  	interface Packet;		// Message manipulator
+    interface Packet;		// Message manipulator
   	
     interface Leds;
     interface Boot;
@@ -48,9 +48,12 @@ implementation {
   
   event void Boot.booted() {
     call AMControl.start();
+    call Timer0.startPeriodic( 1000 );		//timer0 1Hz->mote1
+    call Timer1.startPeriodic( 333 );		//timer1 3Hz->mote2
+    call Timer2.startPeriodic( 200 );		//timer2 5Hz->mote3
   }
 
-  event void AMControl.startDone(error_t err) {
+  event void AMControl.startDone(error_t err) {		//start RADIO
     if (err == SUCCESS) {
       call MilliTimer.startPeriodic(250);
     }
@@ -63,7 +66,12 @@ implementation {
     // do nothing
   }
   
-  event void MilliTimer.fired() {
+
+
+
+
+
+  event void Timer0.fired() {			//new
     counter++;
     dbg("RadioCountToLedsC", "RadioCountToLedsC: timer fired, counter is %hu.\n", counter);
     if (locked) {
@@ -79,6 +87,7 @@ implementation {
       }
 
       rcm->counter = counter;
+      rcm->senderID = TOS_NODE_ID;	//check
       /*
       	Send message
       */
@@ -89,11 +98,77 @@ implementation {
     }
   }
 
+
+ event void Timer1.fired() {			//new
+    counter++;
+    dbg("RadioCountToLedsC", "RadioCountToLedsC: timer fired, counter is %hu.\n", counter);
+    if (locked) {
+      return;
+    }
+    else {
+    	/*
+    	TODO Create and set message
+    	*/
+	  radio_count_msg_t* rcm = (radio_count_msg_t*)call Packet.getPayload(&packet, sizeof(radio_count_msg_t));
+      if (rcm == NULL) {
+		return;
+      }
+
+      rcm->counter = counter;
+      rcm->sendID = TOS_NODE_ID;
+      
+      /*
+      	Send message
+      */
+      if (call AMSend.send(AM_BROADCAST_ADDR, &packet, sizeof(radio_count_msg_t)) == SUCCESS) {
+		dbg("RadioCountToLedsC", "RadioCountToLedsC: packet sent.\n", counter);	
+		locked = TRUE;
+      }
+    }
+  }
+
+
+ event void Timer2.fired() {			//new
+    counter++;
+    dbg("RadioCountToLedsC", "RadioCountToLedsC: timer fired, counter is %hu.\n", counter);
+    if (locked) {
+      return;
+    }
+    else {
+    	/*
+    	TODO Create and set message
+    	*/
+	  radio_count_msg_t* rcm = (radio_count_msg_t*)call Packet.getPayload(&packet, sizeof(radio_count_msg_t));
+      if (rcm == NULL) {
+		return;
+      }
+
+      rcm->counter = counter;
+      rcm->sendID=TOS_NODE_ID;
+      /*
+      	Send message
+      */
+      if (call AMSend.send(AM_BROADCAST_ADDR, &packet, sizeof(radio_count_msg_t)) == SUCCESS) {
+		dbg("RadioCountToLedsC", "RadioCountToLedsC: packet sent.\n", counter);	
+		locked = TRUE;
+      }
+    }
+  }
+
+
+
+
+
   event void AMSend.sendDone(message_t* bufPtr, error_t error) {
     if (&packet == bufPtr) {
       locked = FALSE;
     }
   }
+
+
+
+
+
   
   	/*
   		RECEIVE
@@ -105,22 +180,19 @@ implementation {
     if (len != sizeof(radio_count_msg_t)) {return bufPtr;}
     else {
       radio_count_msg_t* rcm = (radio_count_msg_t*)payload;
-      if (rcm->counter & 0x1) {
-		call Leds.led0On();
+      if (rcm->sendID == 1) {			// se il messaggio proviene da mote1->toggle led0
+		call Leds.led0Toggle();		// se il messaggio proviene da mote2->toggle led1
+      }						// se il messaggio proviene da mote3->toggle led2
+      						// se il messaggio contiene count % 10==0->turn off
+      if (rcm->sendID == 2) {
+		call Leds.led1Toggle();
       }
-      else {
+      if (rcm->sendID == 3) {
+		call Leds.led2Toggle();
+      }
+      if (rcm->count % 10 == 0) {
 		call Leds.led0Off();
-      }
-      if (rcm->counter & 0x2) {
-		call Leds.led1On();
-      }
-      else {
 		call Leds.led1Off();
-      }
-      if (rcm->counter & 0x4) {
-		call Leds.led2On();
-      }
-      else {
 		call Leds.led2Off();
       }
       return bufPtr;
