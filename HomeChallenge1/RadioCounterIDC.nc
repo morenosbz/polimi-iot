@@ -7,17 +7,17 @@
 #include "printf.h"
 #include "Timer.h"
 #include "RadioCounterID.h"
+#include "utils.c"
  
 /**
-	TODO Update this
- * Implementation of the RadioCountToLeds application. RadioCountToLeds 
- * maintains a 4Hz counter, broadcasting its value in an AM packet 
- * every time it gets updated. A RadioCountToLeds node that hears a counter 
- * displays the bottom three bits on its LEDs. This application is a useful 
- * test to show that basic AM communication and timers work.
+ * Implementation of the RadioCounterID application. RadioCounterID 
+ * depending on the Mote id, the frequency is setted, 1Hz, 3Hz or 5Hz.
+ * Then a broadcast message is sent, with the source and the actual count.
+ * As a receiver, the mote identifies the source, toggle the corresponding LED
+ * and if the count is modulus 10, all the leds are turned off.
  *
- * @author Philip Levis
- * @date   June 6 2005
+ * @author D'introno, Moreno, Zaniolo
+ * @date   March 20 2020
  */
 
 module RadioCounterIDC @safe() {
@@ -41,37 +41,21 @@ implementation {
 
   bool locked;
   uint16_t counter = 0;
-  
-  /*
-  	Custom functions
-  */
-  
-  
-  int getPeriodFromID(int id){
-  	if(id == 1){
-		return TIMER_PERIOD_MILLI_1;
-  	}
-  	if(id == 2){
-		return TIMER_PERIOD_MILLI_2;
-  	}
-  	if(id == 3){
-		return TIMER_PERIOD_MILLI_3;
-  	}
-  	//FIXME Add exception for no identified motes
-  	return 0;
-  }
-	
 	/*
 		SEND
 	*/
   
   event void Boot.booted() {
     call AMControl.start();
-    printf("Ciao raga, sono %d!.\n", TOS_NODE_ID);
   }
 
   event void AMControl.startDone(error_t err) {
-  	printf("My Period is %d ms.\n", getPeriodFromID(TOS_NODE_ID));
+  	printf(
+  		"Mote: %d - Period: %d ms.\n",
+  		TOS_NODE_ID,
+  		getPeriodFromID(TOS_NODE_ID)
+	);
+	
     if (err == SUCCESS) {
       call MilliTimer.startPeriodic(
 		getPeriodFromID(TOS_NODE_ID)
@@ -88,7 +72,7 @@ implementation {
     
   event void MilliTimer.fired() {
     counter++;
-    printf("RadioCountToLedsC: timer fired, counter is %d.\n", counter);
+    printf("Timer fired -> counter: %d.\n", counter);
     if (locked) {
       return;
     }
@@ -96,17 +80,22 @@ implementation {
     	/*
     	TODO Create and set message
     	*/
-	  radio_count_msg_t* rcm = (radio_count_msg_t*)call Packet.getPayload(&packet, sizeof(radio_count_msg_t));
+	  id_count_msg_t* rcm = (id_count_msg_t*)call Packet.getPayload(&packet, sizeof(id_count_msg_t));
       if (rcm == NULL) {
 		return;
       }
 
+		/*
+			Fill message
+		*/
+		
       rcm->counter = counter;
+      rcm->src = TOS_NODE_ID;
       /*
       	Send message
       */
-      if (call AMSend.send(AM_BROADCAST_ADDR, &packet, sizeof(radio_count_msg_t)) == SUCCESS) {
-		printf("RadioCountToLedsC: packet sent. %d\n", counter);	
+      if (call AMSend.send(AM_BROADCAST_ADDR, &packet, sizeof(id_count_msg_t)) == SUCCESS) {
+		printf("MSG SENT: %d\n", counter);	
 		locked = TRUE;
       }
     }
@@ -125,27 +114,29 @@ implementation {
   
   event message_t* Receive.receive(message_t* bufPtr, void* payload, uint8_t len) {
     printf("Received packet of length %d.\n", len);
-    if (len != sizeof(radio_count_msg_t)) {return bufPtr;}
+    if (len != sizeof(id_count_msg_t)) {return bufPtr;}
     else {
-      radio_count_msg_t* rcm = (radio_count_msg_t*)payload;
-      if (rcm->counter & 0x1) {
-		call Leds.led0On();
-      }
-      else {
-		call Leds.led0Off();
-      }
-      if (rcm->counter & 0x2) {
-		call Leds.led1On();
-      }
-      else {
+      id_count_msg_t* rcm = (id_count_msg_t*)payload;
+      printf("From MOTE %d -> Counter Received: %d\n", rcm->src, rcm->counter);
+
+      printf(" *** MOD10 -> %d", rcm->counter%10);
+      if(rcm->counter % 10 == 0){
+      	printf(" *** MOD10 -> TURNOFF NOW");
+		call Leds.led0Off();      	
 		call Leds.led1Off();
-      }
-      if (rcm->counter & 0x4) {
-		call Leds.led2On();
-      }
-      else {
 		call Leds.led2Off();
+      } else {
+		  if(rcm->src == 1){
+	  	    call Leds.led0Toggle();
+		  }
+		  if(rcm->src == 2){
+	  	    call Leds.led1Toggle();
+		  }
+		  if(rcm->src == 3){
+	  	    call Leds.led2Toggle();
+		  }
       }
+      
       return bufPtr;
     }
   }
