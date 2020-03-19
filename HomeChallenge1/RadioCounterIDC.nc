@@ -4,6 +4,7 @@
 *	Interfaces implementation
 */
  
+#include "printf.h"
 #include "Timer.h"
 #include "RadioCounterID.h"
  
@@ -31,8 +32,7 @@ module RadioCounterIDC @safe() {
     interface Boot;
     
     interface Timer<TMilli> as MilliTimer;
-    interface SplitControl as AMControl;	// Control interface
-    
+    interface SplitControl as AMControl;	// Control interface    
   }
 }
 implementation {
@@ -64,8 +64,10 @@ implementation {
   }
   
   event void MilliTimer.fired() {
+    printf("Ciao raga!");
+  	printfflush();
     counter++;
-    dbg("RadioCountToLedsC", "RadioCountToLedsC: timer fired, counter is %hu.\n", counter);
+    dbg("RadioCounterIDC", "RadioCountToLedsC: timer fired, counter is %hu.\n", counter);
     if (locked) {
       return;
     }
@@ -83,7 +85,7 @@ implementation {
       	Send message
       */
       if (call AMSend.send(AM_BROADCAST_ADDR, &packet, sizeof(radio_count_msg_t)) == SUCCESS) {
-		dbg("RadioCountToLedsC", "RadioCountToLedsC: packet sent.\n", counter);	
+		dbg("RadioCounterIDC", "RadioCountToLedsC: packet sent.\n", counter);	
 		locked = TRUE;
       }
     }
@@ -101,7 +103,7 @@ implementation {
   
   
   event message_t* Receive.receive(message_t* bufPtr, void* payload, uint8_t len) {
-    dbg("RadioCountToLedsC", "Received packet of length %hhu.\n", len);
+    dbg("RadioCounterIDC", "Received packet of length %hhu.\n", len);
     if (len != sizeof(radio_count_msg_t)) {return bufPtr;}
     else {
       radio_count_msg_t* rcm = (radio_count_msg_t*)payload;

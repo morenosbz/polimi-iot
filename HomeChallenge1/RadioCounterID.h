@@ -12,8 +12,10 @@ typedef nx_struct radio_count_msg {
 } radio_count_msg_t;
 
 enum {
-  AM_RADIO_COUNT_MSG = 6,
-  TIMER_PERIOD_MILLI = 250		// TODO Check this value
+	AM_RADIO_COUNT_MSG = 6,
+	TIMER_PERIOD_MILLI_1 = 1000,	// 1Hz
+	TIMER_PERIOD_MILLI_2 = 333,		// 3Hz
+	TIMER_PERIOD_MILLI_3 = 200,		// 5Hz
 };
 
 #endif

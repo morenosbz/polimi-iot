@@ -4,6 +4,8 @@
 *	Components relationship
 */
  
+#define NEW_PRINTF_SEMANTICS
+#include "printf.h"
 #include "RadioCounterID.h"
 
 /**
@@ -25,6 +27,9 @@ implementation {
   components new AMReceiverC(AM_RADIO_COUNT_MSG);
   components new TimerMilliC();
   components ActiveMessageC;
+  
+  components PrintfC;
+  components SerialStartC;
   
   App.Boot -> MainC.Boot;
   
