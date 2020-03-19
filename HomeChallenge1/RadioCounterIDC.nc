@@ -41,6 +41,25 @@ implementation {
 
   bool locked;
   uint16_t counter = 0;
+  
+  /*
+  	Custom functions
+  */
+  
+  
+  int getPeriodFromID(int id){
+  	if(id == 1){
+		return TIMER_PERIOD_MILLI_1;
+  	}
+  	if(id == 2){
+		return TIMER_PERIOD_MILLI_2;
+  	}
+  	if(id == 3){
+		return TIMER_PERIOD_MILLI_3;
+  	}
+  	//FIXME Add exception for no identified motes
+  	return 0;
+  }
 	
 	/*
 		SEND
@@ -52,8 +71,11 @@ implementation {
   }
 
   event void AMControl.startDone(error_t err) {
+  	printf("My Period is %d ms.\n", getPeriodFromID(TOS_NODE_ID));
     if (err == SUCCESS) {
-      call MilliTimer.startPeriodic(250);
+      call MilliTimer.startPeriodic(
+		getPeriodFromID(TOS_NODE_ID)
+      );
     }
     else {
       call AMControl.start();
