@@ -2,6 +2,7 @@
 *	Politecnico di Milano
 *	IoT - Home Challenge 1
 *	Message structure
+*
 */
 
 #ifndef RADIO_COUNTER_ID_H
