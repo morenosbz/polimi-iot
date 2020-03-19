@@ -28,6 +28,9 @@ implementation {
   components new TimerMilliC();
   components ActiveMessageC;
   
+  /*
+	Serial print components
+  */
   components PrintfC;
   components SerialStartC;
   
