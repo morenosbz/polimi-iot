@@ -7,9 +7,10 @@
 #ifndef RADIO_COUNTER_ID_H
 #define RADIO_COUNTER_ID_H
 
-typedef nx_struct radio_count_msg {
+typedef nx_struct id_count_msg {
+  nx_uint16_t src;			// Source (sender) Mote
   nx_uint16_t counter;		// Counter value
-} radio_count_msg_t;
+} id_count_msg_t;
 
 enum {
 	AM_RADIO_COUNT_MSG = 6,
