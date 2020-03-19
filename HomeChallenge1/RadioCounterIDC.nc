@@ -40,7 +40,7 @@ implementation {
   message_t packet;
 
   bool locked;
-  uint16_t counter = 0;
+  uint16_t msgCounter = 0;
 	/*
 		SEND
 	*/
@@ -71,14 +71,13 @@ implementation {
   }
     
   event void MilliTimer.fired() {
-    counter++;
-    printf("Timer fired -> counter: %d.\n", counter);
+    printf("Timer fired -> counter: %d.\n", msgCounter);
     if (locked) {
       return;
     }
     else {
     	/*
-    	TODO Create and set message
+			Create and set message
     	*/
 	  id_count_msg_t* rcm = (id_count_msg_t*)call Packet.getPayload(&packet, sizeof(id_count_msg_t));
       if (rcm == NULL) {
@@ -89,13 +88,13 @@ implementation {
 			Fill message
 		*/
 		
-      rcm->counter = counter;
+      rcm->counter = msgCounter;
       rcm->src = TOS_NODE_ID;
-      /*
-      	Send message
-      */
+	    /*
+			Send message
+    	*/
       if (call AMSend.send(AM_BROADCAST_ADDR, &packet, sizeof(id_count_msg_t)) == SUCCESS) {
-		printf("MSG SENT: %d\n", counter);	
+		printf("MSG SENT: %d\n", msgCounter);	
 		locked = TRUE;
       }
     }
@@ -113,15 +112,21 @@ implementation {
   
   
   event message_t* Receive.receive(message_t* bufPtr, void* payload, uint8_t len) {
+  	/*
+  	FIXME counter should be a count of any message or only succesfully ones?
+	Update counter for each message received
+	*/
+      msgCounter++;
     printf("Received packet of length %d.\n", len);
     if (len != sizeof(id_count_msg_t)) {return bufPtr;}
     else {
+
       id_count_msg_t* rcm = (id_count_msg_t*)payload;
       printf("From MOTE %d -> Counter Received: %d\n", rcm->src, rcm->counter);
 
-      printf(" *** MOD10 -> %d", rcm->counter%10);
+      printf("  >> MOD10 -> %d\n", rcm->counter%10);
       if(rcm->counter % 10 == 0){
-      	printf(" *** MOD10 -> TURNOFF NOW");
+      	printf("    >> MOD10 -> TURNOFF NOW\n");
 		call Leds.led0Off();      	
 		call Leds.led1Off();
 		call Leds.led2Off();
