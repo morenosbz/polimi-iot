@@ -30,8 +30,8 @@ implementation {
   /*
 	Serial print components
   */
-  components PrintfC;
-  components SerialStartC;
+  components SerialPrintfC;
+  
   
   App.Boot -> MainC.Boot;
   
