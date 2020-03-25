@@ -3,7 +3,8 @@
  *  the node 1 send a request to node 2 until it receives a response.
  *  The reply message contains a reading from the Fake Sensor.
  *
- *  @author Luca Pietro Borsani
+ * @author D'introno, Moreno, Zaniolo
+ * @date   March 28 2020
  */
 
 #include "sendAck.h"
@@ -16,8 +17,14 @@ module sendAckC {
 	interface Boot; 
 	
     //interfaces for communication
+    interface AMSend; 		// Sender Component
+    interface Receive;		// Receiver Component
+  	interface Packet;		// Message manipulator
 	//interface for timer
+    interface Timer<TMilli> as MilliTimer;
     //other interfaces, if needed
+    interface SplitControl;	// Control
+    interface FakeSensorC;
 	
 	//interface used to perform sensor reading (to get the value from a sensor)
 	interface Read<uint16_t>;
