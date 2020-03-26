@@ -15,6 +15,12 @@ implementation {
 /****** COMPONENTS *****/
   components MainC, sendAckC as App;
   //add the other components here
+  components ActiveMessageC;
+  components new AMSenderC(AM_MY_MSG);
+  components new AMReceiverC(AM_MY_MSG);
+  //timer?
+  components new TimerMilliC() as timer;
+  components new FakeSensorC();
 
 /****** INTERFACES *****/
   //Boot interface
@@ -22,9 +28,15 @@ implementation {
 
   /****** Wire the other interfaces down here *****/
   //Send and Receive interfaces
+  App.Receive -> AMReceiverC;
+  App.AMSend -> AMSenderC;
+  
   //Radio Control
+  App.SplitControl -> ActiveMessageC;
   //Interfaces to access package fields
+  App.Packet -> AMSenderC;
   //Timer interface
+  App.MilliTimer -> timer;
   //Fake Sensor read
   App.Read -> FakeSensorC;
 

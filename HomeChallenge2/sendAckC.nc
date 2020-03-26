@@ -16,9 +16,15 @@ module sendAckC {
 	interface Boot; 
 	
     //interfaces for communication
+    
+    interface AMSend;		//Send
+    interface Receive;		//Receive
+    interface SplitControl;	//Radio
 	//interface for timer
+	interface Timer<TMilli> as MilliTimer;
     //other interfaces, if needed
-	
+	interface Packet;
+	interface PacketAcknowledgements;
 	//interface used to perform sensor reading (to get the value from a sensor)
 	interface Read<uint16_t>;
   }
@@ -39,11 +45,14 @@ module sendAckC {
 	 *
 	 * STEPS:
 	 * 1. Prepare the msg
-	 * 2. Set the ACK flag for the message using the PacketAcknowledgements interface
+	 * 2. Set the ACK flag for the message using the PacketAcknowledgements interface	??????
 	 *     (read the docs)
 	 * 3. Send an UNICAST message to the correct node
 	 * X. Use debug statements showing what's happening (i.e. message fields)
 	 */
+	 my_msg_t message;
+	 message->msg_type=REQ;
+	 message->msg_counter=counter;
  }        
 
   //****************** Task send response *****************//
@@ -60,11 +69,20 @@ module sendAckC {
   event void Boot.booted() {
 	dbg("boot","Application booted.\n");
 	/* Fill it ... */
+	call SplitControl.start();
   }
 
   //***************** SplitControl interface ********************//
   event void SplitControl.startDone(error_t err){
     /* Fill it ... */
+    if(err == SUCCESS) {
+    	dbg("radio", "Radio on!\n");
+        call MilliTimer.startPeriodic( 1000 );
+    }
+    else{
+	//dbg for error
+	call SplitControl.start();
+    }
   }
   
   event void SplitControl.stopDone(error_t err){
@@ -77,6 +95,8 @@ module sendAckC {
 	 * When the timer fires, we send a request
 	 * Fill this part...
 	 */
+	 counter++;
+	 sendReq();
   }
   
 
@@ -91,6 +111,19 @@ module sendAckC {
 	 * 2b. Otherwise, send again the request
 	 * X. Use debug statements showing what's happening (i.e. message fields)
 	 */
+	 if (&packet == buf && error == SUCCESS) {
+      dbg("radio_send", "Packet sent...");
+      dbg_clear("radio_send", " at time %s \n", sim_time_string());
+    }
+    else{
+      dbgerror("radio_send", "Send done error!");
+    }
+    if(wasAcked){
+    	MilliTimer.stop();
+    	dbg("ack_send", "Ack is Received");
+    } else{
+    	sendReq();
+    }
   }
 
   //***************************** Receive interface *****************//
@@ -103,6 +136,14 @@ module sendAckC {
 	 * 3. If a request is received, send the response
 	 * X. Use debug statements showing what's happening (i.e. message fields)
 	 */
+	 
+	 if (len != sizeof(sensor_msg_t)) {return bufPtr;}				//CONTROLLA!!
+	 else{
+	 my_msg_t* mess = (my_msg_t*)payload;
+	 	if(mess->type==REQ){
+	 		sendResp();
+	 	}
+	 }
 
   }
   

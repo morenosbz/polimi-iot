@@ -7,9 +7,9 @@
 
 //payload of the msg
 typedef nx_struct my_msg {
-	//field 1
-	//field 2
-	//field 3
+  nx_uint8_t msg_type;
+  nx_uint16_t value;
+  nx_uint16_t msg_counter;
 } my_msg_t;
 
 #define REQ 1
