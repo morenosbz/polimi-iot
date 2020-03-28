@@ -1,0 +1,27 @@
+DEBUG (1): MOTE1 booted.
+DEBUG (1): Period MOTE1 OK
+DEBUG (1): => Timer Fired (1S)
+DEBUG (1):   C-1 :: REQUEST SENT
+ERROR (1):   [x] Packet acknoledgment FAILED
+DEBUG (1): => Timer Fired (1S)
+DEBUG (1):   C-2 :: REQUEST SENT
+ERROR (1):   [x] Packet acknoledgment FAILED
+DEBUG (1): => Timer Fired (1S)
+DEBUG (1):   C-3 :: REQUEST SENT
+ERROR (1):   [x] Packet acknoledgment FAILED
+DEBUG (1): => Timer Fired (1S)
+DEBUG (1):   C-4 :: REQUEST SENT
+ERROR (1):   [x] Packet acknoledgment FAILED
+DEBUG (1): => Timer Fired (1S)
+DEBUG (1):   C-5 :: REQUEST SENT
+ERROR (1):   [x] Packet acknoledgment FAILED
+DEBUG (2): MOTE2 booted.
+DEBUG (1): => Timer Fired (1S)
+DEBUG (1):   C-6 :: REQUEST SENT
+DEBUG (2): ***PACKET RECEIVED -> C-6
+DEBUG (1):   [√] Packet acknoledgment OK
+DEBUG (1):   [√] Timer stopped
+DEBUG (2): Measurement READ OK 50421
+DEBUG (2): C-6 :: RESPONSE SENT
+DEBUG (1): ***PACKET RECEIVED  -> C-6 => MEASUREMENT = 50421
+DEBUG (2):   [√] Packet acknoledgment OK
