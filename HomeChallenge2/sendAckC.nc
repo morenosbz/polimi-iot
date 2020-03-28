@@ -62,7 +62,7 @@ module sendAckC {
 		call PacketAcknowledgements.requestAck(&packet);
 		//dbg("radio_send","BCADD %d\n", AM_BROADCAST_ADDR);
       	if (call AMSend.send(2, &packet, sizeof(mote_req_t)) == SUCCESS) {
-		dbg("radio_send","REQ SENT\n");	
+		dbg("radio_send","C-%d :: REQUEST SENT\n", counter);	
 		locked = TRUE;
       }
 	}        
@@ -81,19 +81,19 @@ module sendAckC {
 		mote_res_t* res = (mote_res_t*)call Packet.getPayload(&packet, sizeof(mote_res_t));
 	
 		if(res == NULL){return;}
-		res->counter = 4; //FIXME Add real counter
+		res->counter = 4; //FIXME
 		res->meas = meas;
 	
 		call PacketAcknowledgements.requestAck(&packet);
 	  	if (call AMSend.send(1, &packet, sizeof(mote_res_t)) == SUCCESS) {
-			dbg("radio_send","RES SENT\n");	
+			dbg("radio_send","C-%d :: RESPONSE SENT\n", counter);	
 			locked = TRUE;
 		}
 	}
 
   //***************** Boot interface ********************//
 	event void Boot.booted() {
-		dbg("boot","Application booted.\n");
+		dbg("boot","MOTE%d booted.\n",TOS_NODE_ID);
 		call SplitControl.start();
 	}
 
@@ -103,7 +103,8 @@ module sendAckC {
 			if(TOS_NODE_ID == 1){
 				dbg(
 					"boot",
-					"Setting period Mote 1\n"
+					"Period MOTE%d OK\n",
+					TOS_NODE_ID
 					);
 				call MilliTimer.startPeriodic(
 					REQ_PERIOD
@@ -129,7 +130,7 @@ module sendAckC {
 		* When the timer fires, we send a request
 		* Fill this part...
 		*/
-		dbg("init","1s -> Timer Fired\n");
+		dbg("init","=> Timer Fired (1S)\n");
 		if (locked) {
 			return;
 		}
@@ -149,11 +150,11 @@ module sendAckC {
 		* X. Use debug statements showing what's happening (i.e. message fields)
 		*/
 		if(call PacketAcknowledgements.wasAcked(buf)){
-			dbg("radio_ack","Packet acknoledgment OK\n");
+			dbg("radio_ack","[√] Packet acknoledgment OK\n");
 			call MilliTimer.stop();
-			dbg("radio_ack","Timer stopped\n");
+			dbg("radio_ack","[√] Timer stopped\n");
 		}else{
-			dbgerror("radio_ack","Packet acknoledgment FAILED\n");
+			dbgerror("radio_ack","[x] Packet acknoledgment FAILED\n");
 		}
 		if (&packet == buf) {
 		  locked = FALSE;
@@ -170,15 +171,20 @@ module sendAckC {
 		* 3. If a request is received, send the response
 		* X. Use debug statements showing what's happening (i.e. message fields)
 		*/
-		dbg("radio_ack","STH RECEIVED\n");
+		dbg("radio_ack","PACKET RECEIVED ");
 	    if (len == sizeof(mote_req_t)){
 	    	mote_req_t* req = (mote_req_t*)payload;
-	    	dbg("radio_ack","Counter received %d\n", req->counter);
+	    	dbg_clear("radio_ack","-> C-%d\n", req->counter);
+	    	counter = req->counter;
 			sendRes();
 	    }
 	    if (len == sizeof(mote_res_t)){
 	    	mote_res_t* res = (mote_res_t*)payload;
-	    	dbg("role","Measurement received %d\n", res->meas);
+	    	dbg_clear(
+	    		"role"," -> C-%d => MEASUREMENT = %d\n",
+	    		res->counter,
+	    		res->meas
+    		);
 	    }	 
 		
 		return buf;
@@ -193,7 +199,7 @@ module sendAckC {
 		* 2. Send back (with a unicast message) the response
 		* X. Use debug statement showing what's happening (i.e. message fields)
 		*/
-		dbg("role","Measurement read OK %d\n",data);
+		dbg("role","Measurement READ OK %d\n",data);
 		sendResponse(data);
 	}
 }
