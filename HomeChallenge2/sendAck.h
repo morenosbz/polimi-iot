@@ -16,14 +16,13 @@ typedef nx_struct my_msg {
 
 #define REQ
 typedef nx_struct mote_req{
-	nx_uint8_t req;
 	nx_uint16_t counter;
 } mote_req_t;
 
 #define RESP 
 typedef nx_struct mote_res{
-	nx_uint8_t res;
 	nx_uint16_t counter;
+	nx_uint16_t meas;
 } mote_res_t;
 
 #endif

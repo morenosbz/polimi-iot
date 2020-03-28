@@ -56,8 +56,7 @@ module sendAckC {
 		mote_req_t* req = (mote_req_t*)call Packet.getPayload(&packet, sizeof(mote_req_t));
 		
 		if(req == NULL){return;}
-		req->req = 1;
-		req->counter = 2;
+		req->counter = counter++;
 		
 		call PacketAcknowledgements.requestAck(&packet);
 		//dbg("radio_send","BCADD %d\n", AM_BROADCAST_ADDR);
@@ -74,18 +73,19 @@ module sendAckC {
 		* `call Read.read()` reads from the fake sensor.
 		* When the reading is done it raise the event read one.
 		*/
-		//FIXME Add sensor
+		//FIXME Uncomment this
 		//call Read.read();
 		mote_res_t* res = (mote_res_t*)call Packet.getPayload(&packet, sizeof(mote_res_t));
 		
 		if(res == NULL){return;}
-		res->res = 3;
 		res->counter = 4;
+		res->meas = 100;
 		
-      	if (call AMSend.send(AM_BROADCAST_ADDR, &packet, sizeof(mote_res_t)) == SUCCESS) {
-		dbg("radio_send","RES SENT\n");	
-		//locked = TRUE;
-      }
+		call PacketAcknowledgements.requestAck(&packet);
+      	if (call AMSend.send(1, &packet, sizeof(mote_res_t)) == SUCCESS) {
+			dbg("radio_send","RES SENT\n");	
+			locked = TRUE;
+		}
 	}
 
   //***************** Boot interface ********************//
@@ -148,7 +148,7 @@ module sendAckC {
 		if(call PacketAcknowledgements.wasAcked(buf)){
 			dbg("radio_ack","Packet acknoledgment OK\n");
 			call MilliTimer.stop();
-			dbg("radio_ack","Timer stoped\n");
+			dbg("radio_ack","Timer stopped\n");
 		}else{
 			dbgerror("radio_ack","Packet acknoledgment FAILED\n");
 		}
@@ -168,8 +168,16 @@ module sendAckC {
 		* X. Use debug statements showing what's happening (i.e. message fields)
 		*/
 		dbg("radio_ack","STH RECEIVED\n");
-		//sendRes();
-		//mote_req_t* req = (mote_req_t*)payload;
+	    if (len == sizeof(mote_req_t)){
+	    	mote_req_t* req = (mote_req_t*)payload;
+	    	dbg("radio_ack","Counter received %d\n", req->counter);
+			sendRes();
+	    }
+	    if (len == sizeof(mote_res_t)){
+	    	mote_res_t* res = (mote_res_t*)payload;
+	    	dbg("radio_ack","Measurement received %d\n", res->meas);
+	    }	 
+		
 		return buf;
 	}
   
@@ -182,7 +190,8 @@ module sendAckC {
 		* 2. Send back (with a unicast message) the response
 		* X. Use debug statement showing what's happening (i.e. message fields)
 		*/
-
+		double meas = ((double)data/65535)*100;
+		dbg("role","Measurement read OK %f\n",meas);
 	}
 }
 
