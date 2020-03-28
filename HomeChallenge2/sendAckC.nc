@@ -66,16 +66,29 @@ module sendAckC {
   //***************** Boot interface ********************//
 	event void Boot.booted() {
 		dbg("boot","Application booted.\n");
-		/* Fill it ... */
+		if(TOS_NODE_ID == 1){
+			dbg(
+				"SplitControl::startDone",
+				"Setting period Mote 1"
+				);
+			call SplitControl.start();
+		}
 	}
 
   //***************** SplitControl interface ********************//
 	event void SplitControl.startDone(error_t err){
-		/* Fill it ... */
+		if (err == SUCCESS) {
+			call MilliTimer.startPeriodic(
+				REQ_PERIOD
+			);
+		}
+		else {
+			call SplitControl.start();
+		}
 	}
   
 	event void SplitControl.stopDone(error_t err){
-		/* Fill it ... */
+		// NOOP
 	}
 
   //***************** MilliTimer interface ********************//
@@ -84,6 +97,7 @@ module sendAckC {
 		* When the timer fires, we send a request
 		* Fill this part...
 		*/
+		
 	}
   
 
