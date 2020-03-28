@@ -37,6 +37,7 @@ module sendAckC {
   uint8_t rec_id;
   message_t packet;
   bool locked;
+  bool stopReq = FALSE;
 
   void sendReq();
   void sendRes();
@@ -56,6 +57,7 @@ module sendAckC {
 		mote_req_t* req = (mote_req_t*)call Packet.getPayload(&packet, sizeof(mote_req_t));
 		
 		if(req == NULL){return;}
+		if(stopReq){return;}	// STOP REQUESTING
 		req->req = 1;
 		req->counter = 2;
 		
@@ -145,6 +147,12 @@ module sendAckC {
 		* 2b. Otherwise, send again the request
 		* X. Use debug statements showing what's happening (i.e. message fields)
 		*/
+		if(call PacketAcknowledgements.wasAcked(buf)){
+			dbg("radio_ack","Packet acknoledgment OK\n");
+			stopReq = TRUE;
+		}else{
+			dbgerror("radio_ack","Packet acknoledgment FAILED\n");
+		}
 		if (&packet == buf) {
 		  locked = FALSE;
 		}
