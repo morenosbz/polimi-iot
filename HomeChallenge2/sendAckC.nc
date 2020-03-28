@@ -81,7 +81,7 @@ module sendAckC {
 		mote_res_t* res = (mote_res_t*)call Packet.getPayload(&packet, sizeof(mote_res_t));
 	
 		if(res == NULL){return;}
-		res->counter = 4; //FIXME
+		res->counter = counter;
 		res->meas = meas;
 	
 		call PacketAcknowledgements.requestAck(&packet);
