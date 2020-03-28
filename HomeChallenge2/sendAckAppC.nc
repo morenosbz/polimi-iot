@@ -18,7 +18,8 @@ implementation {
   components ActiveMessageC;
   components new AMSenderC(AM_MY_MSG);
   components new AMReceiverC(AM_MY_MSG);
-  //timer?
+  //components  PacketAcknowledgements;
+  //timer
   components new TimerMilliC() as timer;
   components new FakeSensorC();
 
@@ -35,6 +36,7 @@ implementation {
   App.SplitControl -> ActiveMessageC;
   //Interfaces to access package fields
   App.Packet -> AMSenderC;
+  App.ack->AMSenderC;
   //Timer interface
   App.MilliTimer -> timer;
   //Fake Sensor read
