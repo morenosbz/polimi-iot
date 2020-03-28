@@ -151,8 +151,10 @@ module sendAckC {
 		*/
 		if(call PacketAcknowledgements.wasAcked(buf)){
 			dbg("radio_ack","[√] Packet acknoledgment OK\n");
-			call MilliTimer.stop();
-			dbg("radio_ack","[√] Timer stopped\n");
+			if(call MilliTimer.isRunning()){
+				call MilliTimer.stop();
+				dbg("radio_ack","[√] Timer stopped\n");
+			}
 		}else{
 			dbgerror("radio_ack","[x] Packet acknoledgment FAILED\n");
 		}
@@ -171,7 +173,7 @@ module sendAckC {
 		* 3. If a request is received, send the response
 		* X. Use debug statements showing what's happening (i.e. message fields)
 		*/
-		dbg("radio_ack","PACKET RECEIVED ");
+		dbg("radio_ack","***PACKET RECEIVED ");
 	    if (len == sizeof(mote_req_t)){
 	    	mote_req_t* req = (mote_req_t*)payload;
 	    	dbg_clear("radio_ack","-> C-%d\n", req->counter);
