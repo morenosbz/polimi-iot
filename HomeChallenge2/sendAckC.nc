@@ -20,6 +20,7 @@ module sendAckC {
     interface AMSend; 		// Sender Component
     interface Receive;		// Receiver Component
   	interface Packet;		// Message manipulator
+    interface PacketAcknowledgements;
 	//interface for timer
     interface Timer<TMilli> as MilliTimer;
     //other interfaces, if needed
@@ -35,9 +36,10 @@ module sendAckC {
   uint8_t counter=0;
   uint8_t rec_id;
   message_t packet;
+  bool locked;
 
   void sendReq();
-  void sendResp();
+  void sendRes();
   
   
   //***************** Send request function ********************//
@@ -51,38 +53,63 @@ module sendAckC {
 		* 3. Send an UNICAST message to the correct node
 		* X. Use debug statements showing what's happening (i.e. message fields)
 		*/
+		mote_req_t* req = (mote_req_t*)call Packet.getPayload(&packet, sizeof(mote_req_t));
+		
+		if(req == NULL){return;}
+		req->req = 1;
+		req->counter = 2;
+		
+      	if (call AMSend.send(AM_BROADCAST_ADDR, &packet, sizeof(mote_req_t)) == SUCCESS) {
+		dbg("radio_send","REQ SENT\n");	
+		locked = TRUE;
+      }
 	}        
 
   //****************** Task send response *****************//
-	void sendResp() {
+	void sendRes() {
 		/* This function is called when we receive the REQ message.
 		* Nothing to do here. 
 		* `call Read.read()` reads from the fake sensor.
 		* When the reading is done it raise the event read one.
 		*/
-		call Read.read();
+		//FIXME Add sensor
+		//call Read.read();
+		mote_res_t* res = (mote_res_t*)call Packet.getPayload(&packet, sizeof(mote_res_t));
+		
+		if(res == NULL){return;}
+		res->res = 3;
+		res->counter = 4;
+		
+      	if (call AMSend.send(AM_BROADCAST_ADDR, &packet, sizeof(mote_res_t)) == SUCCESS) {
+		dbg("radio_send","RES SENT\n");	
+		//locked = TRUE;
+      }
 	}
 
   //***************** Boot interface ********************//
 	event void Boot.booted() {
 		dbg("boot","Application booted.\n");
-		if(TOS_NODE_ID == 1){
-			dbg(
-				"SplitControl::startDone",
-				"Setting period Mote 1"
-				);
-			call SplitControl.start();
-		}
+		call SplitControl.start();
 	}
 
   //***************** SplitControl interface ********************//
 	event void SplitControl.startDone(error_t err){
 		if (err == SUCCESS) {
-			call MilliTimer.startPeriodic(
-				REQ_PERIOD
-			);
+			if(TOS_NODE_ID == 1){
+				dbg(
+					"boot",
+					"Setting period Mote 1\n"
+					);
+				call MilliTimer.startPeriodic(
+					REQ_PERIOD
+				);
+			}
 		}
 		else {
+			dbgerror(
+				"radio",
+				"radio error, restarting\n"
+			);
 			call SplitControl.start();
 		}
 	}
@@ -97,7 +124,11 @@ module sendAckC {
 		* When the timer fires, we send a request
 		* Fill this part...
 		*/
-		
+		dbg("init","1s -> Timer Fired\n");
+		if (locked) {
+			return;
+		}
+		sendReq();
 	}
   
 
@@ -112,6 +143,9 @@ module sendAckC {
 		* 2b. Otherwise, send again the request
 		* X. Use debug statements showing what's happening (i.e. message fields)
 		*/
+		if (&packet == buf) {
+		  locked = FALSE;
+		}
 	}
 
   //***************************** Receive interface *****************//
@@ -124,7 +158,10 @@ module sendAckC {
 		* 3. If a request is received, send the response
 		* X. Use debug statements showing what's happening (i.e. message fields)
 		*/
-
+		dbg("radio_ack","STH RECEIVED\n");
+		//sendRes();
+		//mote_req_t* req = (mote_req_t*)payload;
+		return buf;
 	}
   
   //************************* Read interface **********************//
