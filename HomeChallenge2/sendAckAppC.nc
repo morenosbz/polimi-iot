@@ -33,6 +33,7 @@ implementation {
 	App.SplitControl -> ActiveMessageC;
 	//Interfaces to access package fields
 	App.Packet -> AMSenderC;
+	App.PacketAcknowledgements -> AMSenderC;
 	//Timer interface
 	App.MilliTimer -> TimerMilliC;
 	//Fake Sensor read

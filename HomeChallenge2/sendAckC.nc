@@ -59,7 +59,9 @@ module sendAckC {
 		req->req = 1;
 		req->counter = 2;
 		
-      	if (call AMSend.send(AM_BROADCAST_ADDR, &packet, sizeof(mote_req_t)) == SUCCESS) {
+		call PacketAcknowledgements.requestAck(&packet);
+		//dbg("radio_send","BCADD %d\n", AM_BROADCAST_ADDR);
+      	if (call AMSend.send(2, &packet, sizeof(mote_req_t)) == SUCCESS) {
 		dbg("radio_send","REQ SENT\n");	
 		locked = TRUE;
       }
