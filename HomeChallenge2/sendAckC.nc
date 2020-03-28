@@ -40,6 +40,7 @@ module sendAckC {
 
   void sendReq();
   void sendRes();
+  void sendResponse(double);
   
   
   //***************** Send request function ********************//
@@ -73,16 +74,18 @@ module sendAckC {
 		* `call Read.read()` reads from the fake sensor.
 		* When the reading is done it raise the event read one.
 		*/
-		//FIXME Uncomment this
-		//call Read.read();
+		call Read.read();
+	}
+	
+	void sendResponse(double meas){
 		mote_res_t* res = (mote_res_t*)call Packet.getPayload(&packet, sizeof(mote_res_t));
-		
+	
 		if(res == NULL){return;}
-		res->counter = 4;
-		res->meas = 100;
-		
+		res->counter = 4; //FIXME Add real counter
+		res->meas = meas;
+	
 		call PacketAcknowledgements.requestAck(&packet);
-      	if (call AMSend.send(1, &packet, sizeof(mote_res_t)) == SUCCESS) {
+	  	if (call AMSend.send(1, &packet, sizeof(mote_res_t)) == SUCCESS) {
 			dbg("radio_send","RES SENT\n");	
 			locked = TRUE;
 		}
@@ -175,7 +178,7 @@ module sendAckC {
 	    }
 	    if (len == sizeof(mote_res_t)){
 	    	mote_res_t* res = (mote_res_t*)payload;
-	    	dbg("radio_ack","Measurement received %d\n", res->meas);
+	    	dbg("role","Measurement received %d\n", res->meas);
 	    }	 
 		
 		return buf;
@@ -190,8 +193,8 @@ module sendAckC {
 		* 2. Send back (with a unicast message) the response
 		* X. Use debug statement showing what's happening (i.e. message fields)
 		*/
-		double meas = ((double)data/65535)*100;
-		dbg("role","Measurement read OK %f\n",meas);
+		dbg("role","Measurement read OK %d\n",data);
+		sendResponse(data);
 	}
 }
 
