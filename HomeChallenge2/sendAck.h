@@ -22,7 +22,7 @@ typedef nx_struct mote_req{
 
 #define RESP 
 typedef nx_struct mote_res{
-	nx_uint8_t req;
+	nx_uint8_t res;
 	nx_uint16_t counter;
 } mote_res_t;
 

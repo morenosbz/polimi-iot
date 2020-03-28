@@ -15,6 +15,7 @@ implementation {
 	/****** COMPONENTS *****/
 	components MainC, sendAckC as App;
 	//add the other components here
+	//components new FakeSensorC();
 	components new TimerMilliC();
 	components new AMSenderC(AM_MY_MSG);
 	components new AMReceiverC(AM_MY_MSG);
@@ -35,6 +36,6 @@ implementation {
 	//Timer interface
 	App.MilliTimer -> TimerMilliC;
 	//Fake Sensor read
-	App.Read -> FakeSensorC;
+	//App.Read -> FakeSensorC;
 }
 
