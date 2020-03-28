@@ -57,12 +57,12 @@ module sendAckC {
 		mote_req_t* req = (mote_req_t*)call Packet.getPayload(&packet, sizeof(mote_req_t));
 		
 		if(req == NULL){return;}
-		req->counter = counter++;
+		req->counter = ++counter;
 		
 		call PacketAcknowledgements.requestAck(&packet);
 		//dbg("radio_send","BCADD %d\n", AM_BROADCAST_ADDR);
       	if (call AMSend.send(2, &packet, sizeof(mote_req_t)) == SUCCESS) {
-		dbg("radio_send","C-%d :: REQUEST SENT\n", counter);	
+		dbg("radio_send","  C-%d :: REQUEST SENT\n", counter);	
 		locked = TRUE;
       }
 	}        
@@ -150,13 +150,13 @@ module sendAckC {
 		* X. Use debug statements showing what's happening (i.e. message fields)
 		*/
 		if(call PacketAcknowledgements.wasAcked(buf)){
-			dbg("radio_ack","[√] Packet acknoledgment OK\n");
+			dbg("radio_ack","  [√] Packet acknoledgment OK\n");
 			if(call MilliTimer.isRunning()){
 				call MilliTimer.stop();
-				dbg("radio_ack","[√] Timer stopped\n");
+				dbg("radio_ack","  [√] Timer stopped\n");
 			}
 		}else{
-			dbgerror("radio_ack","[x] Packet acknoledgment FAILED\n");
+			dbgerror("radio_ack","  [x] Packet acknoledgment FAILED\n");
 		}
 		if (&packet == buf) {
 		  locked = FALSE;
