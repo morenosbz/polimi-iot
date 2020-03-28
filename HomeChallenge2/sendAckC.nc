@@ -37,7 +37,6 @@ module sendAckC {
   uint8_t rec_id;
   message_t packet;
   bool locked;
-  bool stopReq = FALSE;
 
   void sendReq();
   void sendRes();
@@ -57,7 +56,6 @@ module sendAckC {
 		mote_req_t* req = (mote_req_t*)call Packet.getPayload(&packet, sizeof(mote_req_t));
 		
 		if(req == NULL){return;}
-		if(stopReq){return;}	// STOP REQUESTING
 		req->req = 1;
 		req->counter = 2;
 		
@@ -149,7 +147,8 @@ module sendAckC {
 		*/
 		if(call PacketAcknowledgements.wasAcked(buf)){
 			dbg("radio_ack","Packet acknoledgment OK\n");
-			stopReq = TRUE;
+			call MilliTimer.stop();
+			dbg("radio_ack","Timer stoped\n");
 		}else{
 			dbgerror("radio_ack","Packet acknoledgment FAILED\n");
 		}
