@@ -2,7 +2,7 @@
  *  Configuration file for wiring of sendAckC module to other common 
  *  components needed for proper functioning
  *
- *  @author Luca Pietro Borsani
+ *   @author D'introno, Moreno, Zaniolo
  */
 
 #include "sendAck.h"
