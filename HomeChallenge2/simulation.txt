@@ -1,3 +1,8 @@
+********************************************
+*                                          *
+*             TOSSIM Script                *
+*                                          *
+********************************************
 Initializing mac....
 Initializing radio channels....
     using topology file: topology.txt
@@ -35,7 +40,7 @@ DEBUG (1): packet n. 1
 DEBUG (1): Packet passed to lower layer successfully!
 	 Payload Sent
 		 type: 1 
-DEBUG (1): Packet sent... at time 0:0:1.987411445 
+DEBUG (1): Packet sent... at time 0:0:1.981567363 
 ERROR (1):   [x] Packet acknoledgment FAILED
 ERROR (1):   Sending again...
 DEBUG (1): Preparing the message... 
@@ -43,7 +48,7 @@ DEBUG (1): packet n. 2
 DEBUG (1): Packet passed to lower layer successfully!
 	 Payload Sent
 		 type: 1 
-DEBUG (1): Packet sent... at time 0:0:2.960052459 
+DEBUG (1): Packet sent... at time 0:0:2.958343485 
 ERROR (1):   [x] Packet acknoledgment FAILED
 ERROR (1):   Sending again...
 DEBUG (1): Preparing the message... 
@@ -51,7 +56,7 @@ DEBUG (1): packet n. 3
 DEBUG (1): Packet passed to lower layer successfully!
 	 Payload Sent
 		 type: 1 
-DEBUG (1): Packet sent... at time 0:0:3.939437819 
+DEBUG (1): Packet sent... at time 0:0:3.940139719 
 ERROR (1):   [x] Packet acknoledgment FAILED
 ERROR (1):   Sending again...
 DEBUG (1): Preparing the message... 
@@ -59,7 +64,7 @@ DEBUG (1): packet n. 4
 DEBUG (1): Packet passed to lower layer successfully!
 	 Payload Sent
 		 type: 1 
-DEBUG (1): Packet sent... at time 0:0:4.915801956 
+DEBUG (1): Packet sent... at time 0:0:4.910354600 
 ERROR (1):   [x] Packet acknoledgment FAILED
 ERROR (1):   Sending again...
 DEBUG (2): Application booted.
@@ -69,25 +74,25 @@ DEBUG (1): packet n. 5
 DEBUG (1): Packet passed to lower layer successfully!
 	 Payload Sent
 		 type: 1 
-DEBUG (2): Received packet at time 0:0:5.892486525
+DEBUG (2): Received packet at time 0:0:5.893264719
 DEBUG (2): >>>Pack 
 		 Payload Received
 		 type: 1 
  		 data: 0 
-DEBUG (1): Packet sent... at time 0:0:5.892654371 
+DEBUG (1): Packet sent... at time 0:0:5.893432565 
 DEBUG (1):   [√] Packet acknoledgment OK
+DEBUG (2): Measurement READ OK
 DEBUG (2): Packet passed to lower layer successfully!
 	 Payload Sent
 		 type: 2 
-DEBUG (1): Received packet at time 0:0:5.904067987
+DEBUG (1): Received packet at time 0:0:5.912597606
 DEBUG (1): >>>Pack 
 		 Payload Received
 		 type: 2 
  		 data: 245 
-DEBUG (2): Packet sent... at time 0:0:5.904235833 
+DEBUG (2): Packet sent... at time 0:0:5.912765452 
 DEBUG (2):   [√] Packet acknoledgment OK
 
 
 
 Simulation finished!
-
