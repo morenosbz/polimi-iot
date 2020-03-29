@@ -3,7 +3,7 @@
  *  the node 1 send a request to node 2 until it receives a response.
  *  The reply message contains a reading from the Fake Sensor.
  *
- *  
+ *  @author D'introno, Moreno, Zaniolo
  */
 
 #include "sendAck.h"
@@ -145,7 +145,6 @@ module sendAckC {
 //2a.
     	call MilliTimer.stop();
     	dbg("radio_ack","  [√] Packet acknoledgment OK\n");
-    	//dbg("radio_ack", "Ack is Received\n");
     }
    else{
 //2b.
@@ -198,6 +197,7 @@ module sendAckC {
      resp->msg_type=RESP;
 	 resp->msg_counter=counter;
      resp->value=data;
+     dbg("read","Measurement READ OK\n");
   //2.
      call ack.requestAck(&packet);
 	 if(call AMSend.send(1, &packet,sizeof(my_msg_t)) == SUCCESS){		//unicast packet to mote#1

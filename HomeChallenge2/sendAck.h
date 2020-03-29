@@ -1,5 +1,5 @@
 /**
- *  @author Luca Pietro Borsani
+ *  @author D'introno, Moreno, Zaniolo
  */
 
 #ifndef SENDACK_H
