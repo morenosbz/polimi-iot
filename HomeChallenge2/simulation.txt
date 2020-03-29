@@ -1,0 +1,93 @@
+Initializing mac....
+Initializing radio channels....
+    using topology file: topology.txt
+    using noise file: meyer-heavy.txt
+Initializing simulator....
+Activate debug message on channel init
+Activate debug message on channel boot
+Activate debug message on channel radio
+Activate debug message on channel radio_send
+Activate debug message on channel radio_ack
+Activate debug message on channel radio_rec
+Activate debug message on channel radio_pack
+Activate debug message on channel role
+Activate debug message on channel counter
+Creating node 1...
+>>>Will boot at time 1 [sec]
+Creating node 2...
+>>>Will boot at time 5 [sec]
+Creating radio channels...
+>>>Setting radio channel from node  1  to node  2  with gain  -60.0  dBm
+>>>Setting radio channel from node  2  to node  1  with gain  -60.0  dBm
+Initializing Closest Pattern Matching (CPM)...
+Reading noise model data file: meyer-heavy.txt
+Loading:##Done!
+>>>Creating noise model for node: 1
+>>>Creating noise model for node: 2
+Start simulation with TOSSIM! 
+
+
+
+DEBUG (1): Application booted.
+DEBUG (1): Radio on!
+DEBUG (1): Preparing the message... 
+DEBUG (1): packet n. 1
+DEBUG (1): Packet passed to lower layer successfully!
+	 Payload Sent
+		 type: 1 
+DEBUG (1): Packet sent... at time 0:0:1.987411445 
+ERROR (1):   [x] Packet acknoledgment FAILED
+ERROR (1):   Sending again...
+DEBUG (1): Preparing the message... 
+DEBUG (1): packet n. 2
+DEBUG (1): Packet passed to lower layer successfully!
+	 Payload Sent
+		 type: 1 
+DEBUG (1): Packet sent... at time 0:0:2.960052459 
+ERROR (1):   [x] Packet acknoledgment FAILED
+ERROR (1):   Sending again...
+DEBUG (1): Preparing the message... 
+DEBUG (1): packet n. 3
+DEBUG (1): Packet passed to lower layer successfully!
+	 Payload Sent
+		 type: 1 
+DEBUG (1): Packet sent... at time 0:0:3.939437819 
+ERROR (1):   [x] Packet acknoledgment FAILED
+ERROR (1):   Sending again...
+DEBUG (1): Preparing the message... 
+DEBUG (1): packet n. 4
+DEBUG (1): Packet passed to lower layer successfully!
+	 Payload Sent
+		 type: 1 
+DEBUG (1): Packet sent... at time 0:0:4.915801956 
+ERROR (1):   [x] Packet acknoledgment FAILED
+ERROR (1):   Sending again...
+DEBUG (2): Application booted.
+DEBUG (2): Radio on!
+DEBUG (1): Preparing the message... 
+DEBUG (1): packet n. 5
+DEBUG (1): Packet passed to lower layer successfully!
+	 Payload Sent
+		 type: 1 
+DEBUG (2): Received packet at time 0:0:5.892486525
+DEBUG (2): >>>Pack 
+		 Payload Received
+		 type: 1 
+ 		 data: 0 
+DEBUG (1): Packet sent... at time 0:0:5.892654371 
+DEBUG (1):   [√] Packet acknoledgment OK
+DEBUG (2): Packet passed to lower layer successfully!
+	 Payload Sent
+		 type: 2 
+DEBUG (1): Received packet at time 0:0:5.904067987
+DEBUG (1): >>>Pack 
+		 Payload Received
+		 type: 2 
+ 		 data: 245 
+DEBUG (2): Packet sent... at time 0:0:5.904235833 
+DEBUG (2):   [√] Packet acknoledgment OK
+
+
+
+Simulation finished!
+
