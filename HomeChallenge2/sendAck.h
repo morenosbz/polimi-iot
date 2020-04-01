@@ -1,22 +1,22 @@
 /**
-* @author D'introno, Moreno, Zaniolo
-* @date   March 20 2020
-*/
+ *  @author D'introno, Moreno, Zaniolo
+ */
 
 #ifndef SENDACK_H
 #define SENDACK_H
-#define REQ_PERIOD 1000 	// 	1s
-#define AM_MY_MSG 6
 
-#define REQ
-typedef nx_struct mote_req{
-	nx_uint16_t counter;
-} mote_req_t;
+//payload of the msg
+typedef nx_struct my_msg {
+  nx_uint8_t msg_type;
+  nx_uint16_t value;
+  nx_uint16_t msg_counter;
+} my_msg_t;
 
-#define RESP 
-typedef nx_struct mote_res{
-	nx_uint16_t counter;
-	nx_uint16_t meas;
-} mote_res_t;
+#define REQ 1
+#define RESP 2 
+
+enum{
+AM_MY_MSG = 6,
+};
 
 #endif
