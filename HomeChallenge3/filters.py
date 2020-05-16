@@ -63,7 +63,7 @@ def question5():
 	f51 = lambda r: DNSRR in r and "broker.hivemq.com" in r[DNSRR].rrname 
 	hivemq_pkts = hw.filter(f51)
 	hivemq_ip = set(map(lambda r: r[DNSRR].rdata, hivemq_pkts))
-	print "IPs from the broker broker.hivemq.com"
+	print "IPs of the broker broker.hivemq.com"
 	print hivemq_ip
 	
 	f52 = lambda r: MQTT in r and r[MQTT].type == MQTT_TYPE_CONNECT
@@ -122,8 +122,18 @@ def question7():
 	f73 = lambda r: r[MQTT].value in error_msgs
 	last_pkts = pub_qos0_pkts.filter(f73)
 	print "Publish packets QOS0 with a LastWill Message = " + str(len(last_pkts))
-		
-question7()
+	
+def question9():
+	f91 = lambda r: MQTT in r and r[MQTT].type == MQTT_TYPE_CONNECT
+	conn_pkts = hw.filter(f91)
+	
+	f92 = lambda r: r[MQTT].protolevel == 5
+	conn_v5_pkts = conn_pkts.filter(f92)
+	conn_v5_len = map(lambda r: len(r), conn_v5_pkts)
+	avg = sum(conn_v5_len)/len(conn_v5_len)
+	print "Packet average " + str(avg)
+	
+question9()
 
 
 
