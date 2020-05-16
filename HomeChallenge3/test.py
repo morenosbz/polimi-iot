@@ -1,11 +1,17 @@
-import sys
-from scapy.all import *
+#import scapy.all
+#from scapy.contrib.coap import *
+#from scapy.contrib.mqtt import *
 
+import os
+print os.sys.path
+os.sys.path.append('/usr/local/lib/python2.7/dist-packages')
+print os.sys.path
 
 def method_filter_HTTP(pkt):
-    print pkt
+    print(pkt)
     # Your processing
 
 
-a = rdpcap("homework3.pcap")
-sniff(offline="homework3.pcap", prn=method_filter_HTTP, store=0)
+# hw = rdpcap("homework3.pcap")
+
+
