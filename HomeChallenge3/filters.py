@@ -123,6 +123,29 @@ def question7():
 	last_pkts = pub_qos0_pkts.filter(f73)
 	print "Publish packets QOS0 with a LastWill Message = " + str(len(last_pkts))
 	
+def question8():
+	f81 = lambda r: MQTT in r and r[MQTT].type == MQTT_TYPE_CONNECT and "4m3DW" in r[MQTT].clientId
+	connect_pkts = hw.filter(f81)
+	#connect_seq = map(my_print, connect_pkts)
+	print "Connections containing clientId = 4m3DW"
+	conn_print = lambda r: r[IP].src + ':' + str(r[TCP].sport)
+	connect_pkts.show(conn_print)
+	connect_ports = map(lambda r: r[TCP].sport, connect_pkts)
+	connect_ips = map(lambda r: r[IP].src, connect_pkts)
+	
+	f82 = lambda r: MQTT in r and TCP in r and r[TCP].sport in connect_ports and r[IP].src in connect_ips
+	stream_pkts = hw.filter(f82)
+	stream_print = lambda r: "Packet IP.id= "+ str(r[IP].id)
+	print "MQTT Stream of that client"
+	stream_pkts.show(stream_print)
+	
+	f83 = lambda r: r[MQTT].type == MQTT_TYPE_PUBLISH
+	pub_pkts = stream_pkts.filter(f83)
+	my_print = lambda r: r[MQTT].show()
+	pub_pkts.show(my_print)
+	
+	
+	
 def question9():
 	f91 = lambda r: MQTT in r and r[MQTT].type == MQTT_TYPE_CONNECT
 	conn_pkts = hw.filter(f91)
@@ -133,7 +156,7 @@ def question9():
 	avg = sum(conn_v5_len)/len(conn_v5_len)
 	print "Packet average " + str(avg)
 	
-question9()
+question8()
 
 
 
