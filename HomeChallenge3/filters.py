@@ -7,7 +7,9 @@ COAP_CONTENT = 69
 LOCALHOST = "127.0.0.1"
 
 MQTT_TYPE_CONNECT = 1
+MQTT_TYPE_CONNACK = 2
 MQTT_TYPE_PUBLISH = 3
+MQTT_TYPE_PUBACK = 4
 
 MQTT_WILLFLAG_ENABLE = 1
 
@@ -86,9 +88,30 @@ def question6():
 	f61 = lambda r: MQTT in r and r[MQTT].type == MQTT_TYPE_PUBLISH and r[MQTT].QOS == 1
 	pub_pkts = hw.filter(f61)
 	print "Publish packets QOS1 total = " + str(len(pub_pkts))
+	pub_ids = set(map(lambda r: r[MQTT].msgid, pub_pkts))
+	print "Messages' ID to publish"
+	print pub_ids
 	
-	my_print = lambda r: r[MQTT].show()
-	#pub_pkts.show(my_print)
+	f62 = lambda r: MQTT in r and r[MQTT].type == MQTT_TYPE_PUBACK
+	puback_pkts = hw.filter(f62)
+	print "Ackowledged publish packets total = " + str(len(puback_pkts))
+	
+	f63 = lambda r: not MQTT in r[MQTT][MQTTPuback]
+	puback_ef_pkts = puback_pkts.filter(f63)
+	print "Ackowledged publish packets without errors = " + str(len(puback_ef_pkts))
+	ack_ids = set(map(lambda r: r[MQTT].msgid, puback_ef_pkts))
+	print "Messages' ID acknowledged"
+	print ack_ids
+	
+	notack_ids = pub_ids - ack_ids
+	f64 = lambda r: r[MQTT].msgid in notack_ids
+	res1 = pub_pkts.filter(f64)
+	print "Published messages id without ack = " + str(len(res1))
+	
+	
+	
+	#my_print = lambda r: r[IP].id
+	#puback_ef_pkts.show(my_print)
 	
 	
 question6()
