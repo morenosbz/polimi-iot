@@ -108,13 +108,22 @@ def question6():
 	res1 = pub_pkts.filter(f64)
 	print "Published messages id without ack = " + str(len(res1))
 	
+def question7():	
+	f71 = lambda r: MQTT in r and r[MQTT].type == MQTT_TYPE_CONNECT
+	conn_pkts = hw.filter(f71)
+	error_msgs = set(map(lambda r: r[MQTT].willmsg,conn_pkts))
+	#conn_pkts.show(my_print)
+	print "Error messages total = " + str(len(error_msgs))
 	
+	f72 = lambda r: MQTT in r and r[MQTT].type == MQTT_TYPE_PUBLISH and r[MQTT].QOS == 0
+	pub_qos0_pkts = hw.filter(f72)
+	print "Publish packets QOS0 total = " + str(len(pub_qos0_pkts))
 	
-	#my_print = lambda r: r[IP].id
-	#puback_ef_pkts.show(my_print)
-	
-	
-question6()
+	f73 = lambda r: r[MQTT].value in error_msgs
+	last_pkts = pub_qos0_pkts.filter(f73)
+	print "Publish packets QOS0 with a LastWill Message = " + str(len(last_pkts))
+		
+question7()
 
 
 
