@@ -56,9 +56,11 @@ def question4():
 	f43 = lambda r: r[TCP].sport in connect_ports
 	jane_publish = topic_pkts.filter(f43)
 	print "Published messages from jane"
-	my_print = lambda r: "Packet IP.id= "+ str(r[IP].id)
+	my_print = lambda r: "Packet IP.id= "+ str(r[IP].id) + " : " + r[MQTT].topic
+	#my_print = lambda r: r[MQTT].show()
 	jane_publish.show(my_print)
 	print "Total packets from a connection with username eq jane = " + str(len(jane_publish))
+	
 	
 def question5():
 	f51 = lambda r: DNSRR in r and "broker.hivemq.com" in r[DNSRR].rrname 
@@ -107,6 +109,8 @@ def question6():
 	notack_ids = pub_ids - ack_ids
 	f64 = lambda r: r[MQTT].msgid in notack_ids
 	res1 = pub_pkts.filter(f64)
+	my_print = lambda r: "Packet IP.id= "+ str(r[IP].id)
+	res1.show(my_print)
 	print "Published messages id without ack = " + str(len(res1))
 	
 def question7():	
@@ -189,7 +193,7 @@ def question10():
 		print ip + ':' + str(port) + " = " + str(len(cli_pkts))
 
 	
-question10()
+question6()
 
 
 
