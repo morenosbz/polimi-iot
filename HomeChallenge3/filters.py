@@ -10,6 +10,7 @@ MQTT_TYPE_CONNECT = 1
 MQTT_TYPE_CONNACK = 2
 MQTT_TYPE_PUBLISH = 3
 MQTT_TYPE_PUBACK = 4
+MQTT_TYPE_SUBSCRIBE = 8
 
 MQTT_WILLFLAG_ENABLE = 1
 
@@ -124,10 +125,10 @@ def question7():
 	print "Publish packets QOS0 with a LastWill Message = " + str(len(last_pkts))
 	
 def question8():
-	f81 = lambda r: MQTT in r and r[MQTT].type == MQTT_TYPE_CONNECT and "4m3DW" in r[MQTT].clientId
+	f81 = lambda r: MQTT in r and r[MQTT].type == MQTT_TYPE_CONNECT and "4m3DWYzWr" in r[MQTT].clientId
 	connect_pkts = hw.filter(f81)
 	#connect_seq = map(my_print, connect_pkts)
-	print "Connections containing clientId = 4m3DW"
+	print "Connections containing clientId = 4m3DWYzWr"
 	conn_print = lambda r: r[IP].src + ':' + str(r[TCP].sport)
 	connect_pkts.show(conn_print)
 	connect_ports = map(lambda r: r[TCP].sport, connect_pkts)
@@ -139,11 +140,23 @@ def question8():
 	print "MQTT Stream of that client"
 	stream_pkts.show(stream_print)
 	
-	f83 = lambda r: r[MQTT].type == MQTT_TYPE_PUBLISH
-	pub_pkts = stream_pkts.filter(f83)
-	my_print = lambda r: r[MQTT].show()
+	f83 = lambda r: r[MQTT].type == MQTT_TYPE_PUBLISH and r[MQTT].QOS > 0
+	pub_pkts = stream_pkts.filter(f83) 
+	print "MQTT Publish packets QOS>0 = " + str(len(pub_pkts))
+	my_print = lambda r: "Packet IP.id= "+ str(r[IP].id) + ':' +  r[MQTT].topic + " + " + r[MQTT].value + " RETAINED: " + str(r[MQTT].RETAIN)
 	pub_pkts.show(my_print)
 	
+	msgids = set(map(lambda r: r[MQTT].msgid ,pub_pkts))
+	topics = set(map(lambda r: r[MQTT].topic ,pub_pkts))
+	values = set(map(lambda r: r[MQTT].value ,pub_pkts))
+	
+	f84 = lambda r: MQTT in r and r[MQTT].type == MQTT_TYPE_SUBSCRIBE and r[MQTT].topic in topics
+	subs_pkts = hw.filter(f84)
+	print "Subscribed clients to the topic = " + str(len(subs_pkts))
+	
+	f85 = lambda r: r[MQTT].type == MQTT_TYPE_PUBLISH and r[MQTT].topic in topics and r[MQTT].value in values
+	topic_pkts = stream_pkts.filter(f85) 
+	print "Packets sent to the same topic with the same value = " + str(len(topic_pkts))
 	
 	
 def question9():
@@ -155,6 +168,8 @@ def question9():
 	conn_v5_len = map(lambda r: len(r), conn_v5_pkts)
 	avg = sum(conn_v5_len)/len(conn_v5_len)
 	print "Packet average " + str(avg)
+	
+
 	
 question8()
 
