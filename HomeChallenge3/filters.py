@@ -169,9 +169,27 @@ def question9():
 	avg = sum(conn_v5_len)/len(conn_v5_len)
 	print "Packet average " + str(avg)
 	
+def question10():
+	f101 = lambda r: MQTT in r and r[MQTT].type == MQTT_TYPE_CONNECT
+	conn_pkts = hw.filter(f101)
+	print "Total connection packets = " + str(len(conn_pkts))
+	klive_pkts = conn_pkts.filter(lambda r: r[MQTT].klive < 165)
+	print "Total connection packets with klive < 165s = " + str(len(klive_pkts))
+	addresses = map(lambda r: [r[IP].src,r[TCP].sport,r[MQTT].klive], klive_pkts)
+	
+	
+	f102 = lambda r: MQTT in r and r[MQTT].type == MQTT_TYPE_PUBLISH
+	pub_pkts = hw.filter(f102)
+	print "Interactions with broker"
+	for address in addresses:
+		ip = address[0]
+		port = address[1]
+		f103 = lambda r:  r[IP].src == ip and r[TCP].sport == port
+		cli_pkts = pub_pkts.filter(f103)
+		print ip + ':' + str(port) + " = " + str(len(cli_pkts))
 
 	
-question8()
+question10()
 
 
 
