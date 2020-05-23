@@ -81,8 +81,8 @@
     "outputs": 1,
     "noerr": 0,
     "x": 260,
-    "y": 340,
-    "wires": [["cbe2fa46.e8cb98"]]
+    "y": 400,
+    "wires": [["37abcc24.6c9d44"]]
   },
   {
     "id": "af06080f.d45818",
@@ -95,7 +95,7 @@
     "sendError": false,
     "x": 260,
     "y": 220,
-    "wires": [["a5298251.1bc7b"]]
+    "wires": [["73c92669.007be8"]]
   },
   {
     "id": "a5298251.1bc7b",
@@ -106,40 +106,8 @@
     "outputs": 1,
     "noerr": 0,
     "x": 260,
-    "y": 280,
+    "y": 340,
     "wires": [["99edd4.f06dd23"]]
-  },
-  {
-    "id": "1f37f9df.31489e",
-    "type": "debug",
-    "z": "e4ce69dd.efe6c8",
-    "name": "",
-    "active": true,
-    "tosidebar": true,
-    "console": true,
-    "tostatus": false,
-    "complete": "true",
-    "x": 870,
-    "y": 420,
-    "wires": []
-  },
-  {
-    "id": "cbe2fa46.e8cb98",
-    "type": "switch",
-    "z": "e4ce69dd.efe6c8",
-    "name": "",
-    "property": "sensor.source",
-    "propertyType": "msg",
-    "rules": [
-      { "t": "eq", "v": "plc", "vt": "str" },
-      { "t": "eq", "v": "hv", "vt": "str" }
-    ],
-    "checkall": "true",
-    "repair": false,
-    "outputs": 2,
-    "x": 250,
-    "y": 420,
-    "wires": [["71e5f5a1.ebbd34"], ["37abcc24.6c9d44"]]
   },
   {
     "id": "99f9a13d.a4adf",
@@ -151,28 +119,9 @@
     "console": false,
     "tostatus": false,
     "complete": "true",
-    "x": 710,
-    "y": 540,
+    "x": 450,
+    "y": 460,
     "wires": []
-  },
-  {
-    "id": "71e5f5a1.ebbd34",
-    "type": "delay",
-    "z": "e4ce69dd.efe6c8",
-    "name": "",
-    "pauseType": "rate",
-    "timeout": "2",
-    "timeoutUnits": "seconds",
-    "rate": "1",
-    "nbRateUnits": "10",
-    "rateUnits": "second",
-    "randomFirst": "1",
-    "randomLast": "5",
-    "randomUnits": "seconds",
-    "drop": false,
-    "x": 520,
-    "y": 360,
-    "wires": [["7f7a115a.3943f"]]
   },
   {
     "id": "37abcc24.6c9d44",
@@ -183,47 +132,15 @@
     "timeout": "2",
     "timeoutUnits": "seconds",
     "rate": "1",
-    "nbRateUnits": "30",
-    "rateUnits": "second",
-    "randomFirst": "1",
-    "randomLast": "5",
-    "randomUnits": "seconds",
-    "drop": false,
-    "x": 520,
-    "y": 480,
-    "wires": [["99f9a13d.a4adf", "bfdbe110.40389"]]
-  },
-  {
-    "id": "d3c8a64b.f1de28",
-    "type": "mqtt out",
-    "z": "e4ce69dd.efe6c8",
-    "name": "TS",
-    "topic": "",
-    "qos": "",
-    "retain": "",
-    "broker": "136d51e6.7b9706",
-    "x": 870,
-    "y": 360,
-    "wires": []
-  },
-  {
-    "id": "7f7a115a.3943f",
-    "type": "delay",
-    "z": "e4ce69dd.efe6c8",
-    "name": "",
-    "pauseType": "delay",
-    "timeout": "15",
-    "timeoutUnits": "seconds",
-    "rate": "1",
     "nbRateUnits": "1",
-    "rateUnits": "second",
+    "rateUnits": "minute",
     "randomFirst": "1",
     "randomLast": "5",
     "randomUnits": "seconds",
     "drop": false,
-    "x": 700,
-    "y": 360,
-    "wires": [["1f37f9df.31489e", "d3c8a64b.f1de28"]]
+    "x": 250,
+    "y": 460,
+    "wires": [["99f9a13d.a4adf", "bfdbe110.40389"]]
   },
   {
     "id": "bfdbe110.40389",
@@ -234,8 +151,27 @@
     "qos": "",
     "retain": "",
     "broker": "136d51e6.7b9706",
-    "x": 710,
-    "y": 480,
+    "x": 270,
+    "y": 520,
     "wires": []
+  },
+  {
+    "id": "73c92669.007be8",
+    "type": "delay",
+    "z": "e4ce69dd.efe6c8",
+    "name": "",
+    "pauseType": "delay",
+    "timeout": "5",
+    "timeoutUnits": "seconds",
+    "rate": "1",
+    "nbRateUnits": "1",
+    "rateUnits": "second",
+    "randomFirst": "1",
+    "randomLast": "5",
+    "randomUnits": "seconds",
+    "drop": false,
+    "x": 260,
+    "y": 280,
+    "wires": [["a5298251.1bc7b"]]
   }
 ]
