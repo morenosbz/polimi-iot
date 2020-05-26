@@ -1,0 +1,214 @@
+[
+    {
+        "id": "b5d1af96.0416f8",
+        "type": "tab",
+        "label": "Flow 1",
+        "disabled": false,
+        "info": ""
+    },
+    {
+        "id": "a6970558.9f8078",
+        "type": "file in",
+        "z": "b5d1af96.0416f8",
+        "name": "",
+        "filename": "/home/user/Desktop/Shared1/traffic.csv",
+        "format": "lines",
+        "chunk": false,
+        "sendError": false,
+        "x": 360,
+        "y": 40,
+        "wires": [
+            [
+                "c30997d4.ba28f8"
+            ]
+        ]
+    },
+    {
+        "id": "52b5dac1.1d493c",
+        "type": "inject",
+        "z": "b5d1af96.0416f8",
+        "name": "",
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "x": 120,
+        "y": 40,
+        "wires": [
+            [
+                "a6970558.9f8078"
+            ]
+        ]
+    },
+    {
+        "id": "c30997d4.ba28f8",
+        "type": "function",
+        "z": "b5d1af96.0416f8",
+        "name": "CSV manipulation",
+        "func": "var publish_message_arr = []; \nvar message = [];\nvar n = msg.payload.split(',')\nvar i\nfor(i = 0; i < (n.length - publish_message_arr.length + 1) / 2; i++){\n    if(n[i].match(/publish message/i)){\n        if(n[i].match(/\\[(factory\\/department1\\/section1\\/plc|factory\\/department3\\/section3\\/plc)\\]/i)){\n            publish_message_arr.push(\"plc\")\n        }\n        else if(n[i].match(/\\[(factory\\/department1\\/section1\\/hydraulic_valve|factory\\/department3\\/section3\\/hydraulic_valve)\\]/i)){\n            publish_message_arr.push(\"valve\")\n        }\n        else{\n            publish_message_arr.push(\"other\")\n        }\n    }\n}\nfor (i=0;i < publish_message_arr.length;i++)\n{\n    if (publish_message_arr[i] === \"plc\"){\n        var split = n[n.length - publish_message_arr.length + i].split(\" \");\n        var buf = Buffer.from(split[split.length - 1], 'hex');\n        message.push({payload : buf.toString(\"utf8\"), topic : \"channels/1067830/publish/fields/field1/CCHUYFXS8DC1DDFK\"});\n    }\n    else if (publish_message_arr[i] === \"valve\"){\n        var split = n[n.length - publish_message_arr.length + i].split(\" \");\n        var buf = Buffer.from(split[split.length - 1], 'hex');\n        message.push({payload : buf.toString(\"utf8\"), topic : \"channels/1067830/publish/fields/field2/CCHUYFXS8DC1DDFK\"});\n    }\n}\nif (message.length !== 0)\n    return [msg, message];\n\n",
+        "outputs": 2,
+        "noerr": 0,
+        "x": 150,
+        "y": 140,
+        "wires": [
+            [
+                "17d99012.fefd2"
+            ],
+            [
+                "60280964.e5c7f8"
+            ]
+        ],
+        "outputLabels": [
+            "msg",
+            "plc"
+        ]
+    },
+    {
+        "id": "17d99012.fefd2",
+        "type": "debug",
+        "z": "b5d1af96.0416f8",
+        "name": "filtered msgs",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "x": 410,
+        "y": 120,
+        "wires": []
+    },
+    {
+        "id": "13da67db.f64468",
+        "type": "mqtt out",
+        "z": "b5d1af96.0416f8",
+        "name": "",
+        "topic": "",
+        "qos": "0",
+        "retain": "false",
+        "broker": "12adf382.fd69c4",
+        "x": 590,
+        "y": 240,
+        "wires": []
+    },
+    {
+        "id": "63acc623.c356e",
+        "type": "debug",
+        "z": "b5d1af96.0416f8",
+        "name": "translated payload",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "x": 630,
+        "y": 160,
+        "wires": []
+    },
+    {
+        "id": "60280964.e5c7f8",
+        "type": "json",
+        "z": "b5d1af96.0416f8",
+        "name": "",
+        "property": "payload",
+        "action": "",
+        "pretty": false,
+        "x": 390,
+        "y": 160,
+        "wires": [
+            [
+                "63acc623.c356e",
+                "3e5d2d60.d3c9f2"
+            ]
+        ]
+    },
+    {
+        "id": "798b1383.447e3c",
+        "type": "delay",
+        "z": "b5d1af96.0416f8",
+        "name": "",
+        "pauseType": "rate",
+        "timeout": "1",
+        "timeoutUnits": "minutes",
+        "rate": "1",
+        "nbRateUnits": "1",
+        "rateUnits": "minute",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": false,
+        "x": 420,
+        "y": 240,
+        "wires": [
+            [
+                "13da67db.f64468",
+                "c9be411a.653ce8"
+            ]
+        ]
+    },
+    {
+        "id": "3e5d2d60.d3c9f2",
+        "type": "change",
+        "z": "b5d1af96.0416f8",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "payload.value",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 150,
+        "y": 240,
+        "wires": [
+            [
+                "798b1383.447e3c"
+            ]
+        ]
+    },
+    {
+        "id": "c9be411a.653ce8",
+        "type": "debug",
+        "z": "b5d1af96.0416f8",
+        "name": "msg sent",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "x": 600,
+        "y": 300,
+        "wires": []
+    },
+    {
+        "id": "12adf382.fd69c4",
+        "type": "mqtt-broker",
+        "z": "",
+        "name": "",
+        "broker": "mqtt.thingspeak.com",
+        "port": "1883",
+        "clientid": "",
+        "usetls": false,
+        "compatmode": true,
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": ""
+    }
+]
