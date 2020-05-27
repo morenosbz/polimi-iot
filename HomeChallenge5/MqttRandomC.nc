@@ -4,7 +4,6 @@
 *	Interfaces implementation
 */
  
-//TODO:
 //#include <cstdlib>
 #include "printf.h"
 #include "Timer.h"
@@ -26,7 +25,8 @@ module MqttRandomC @safe() {
     interface Boot;
     
     interface Timer<TMilli> as MilliTimer;
-    interface SplitControl as AMControl;	// Control interface    
+    interface SplitControl as AMControl;	// Control interface   
+    interface Random; 
   }
 }
 implementation {
@@ -34,9 +34,8 @@ implementation {
   message_t packet;
 
   bool locked;
-  //TODO:
   //uint16_t val = rand() % 100;
-  uint16_t msgCounter = 88;
+  uint16_t val = 88;
 	/*
 		SEND
 	*/
@@ -67,7 +66,8 @@ implementation {
   }
     
   event void MilliTimer.fired() {
-    printf("Timer fired -> counter: %d.\n", msgCounter);
+  	val = call Random.rand16();
+    printf("Timer fired -> counter: %d.\n", val);
     if (locked) {
       return;
     }
@@ -84,13 +84,13 @@ implementation {
 			Fill message
 		*/
 		
-      rcm->counter = msgCounter;
+      rcm->counter = val;
       rcm->src = TOS_NODE_ID;
 	    /*
 			Send message
     	*/
-      if (call AMSend.send(AM_BROADCAST_ADDR, &packet, sizeof(mqtt_random_msg_t)) == SUCCESS) {
-		printf("MSG SENT: %d\n", msgCounter);	
+      if (call AMSend.send(1, &packet, sizeof(mqtt_random_msg_t)) == SUCCESS) {
+		printf("MSG SENT: %d\n", val);	
 		locked = TRUE;
       }
     }
@@ -112,7 +112,6 @@ implementation {
   	FIXME counter should be a count of any message or only succesfully ones?
 	Update counter for each message received
 	*/
-      msgCounter++;
     printf("Received packet of length %d.\n", len);
     if (len != sizeof(mqtt_random_msg_t)) {return bufPtr;}
     else {

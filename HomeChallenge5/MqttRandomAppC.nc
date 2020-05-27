@@ -15,11 +15,12 @@
 
 configuration MqttRandomAppC {}
 implementation {
-  components MainC, MqttRandomC as App;
+  components MainC, MqttRandomC as App, RandomC;
   components new AMSenderC(AM_RADIO_COUNT_MSG);
   components new AMReceiverC(AM_RADIO_COUNT_MSG);
   components new TimerMilliC();
   components ActiveMessageC;
+  
   
   /*
 	Serial print components
@@ -34,6 +35,7 @@ implementation {
   App.AMControl -> ActiveMessageC;
   App.MilliTimer -> TimerMilliC;
   App.Packet -> AMSenderC;
+  App.Random -> RandomC;
 }
 
 
