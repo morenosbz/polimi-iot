@@ -66,7 +66,7 @@ implementation {
   }
     
   event void MilliTimer.fired() {
-  	val = call Random.rand16();
+  	val = call Random.rand16() % 11;
     printf("Timer fired -> counter: %d.\n", val);
     if (locked) {
       return;
