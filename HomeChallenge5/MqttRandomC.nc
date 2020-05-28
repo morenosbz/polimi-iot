@@ -45,20 +45,20 @@ implementation {
   }
 
   event void AMControl.startDone(error_t err) {
-  	printf(
-  		"Mote: %d - Period: %d ms.\n",
-  		TOS_NODE_ID,
-  		TIMER_PERIOD_MILLI
-	);
 	
-    if (err == SUCCESS) {
-      call MilliTimer.startPeriodic(
-		TIMER_PERIOD_MILLI
-      );
+    if (err == SUCCESS && TOS_NODE_ID > 1) {
+	  	printf(
+	  		"Mote: %d - Period: %d ms.\n",
+	  		TOS_NODE_ID,
+	  		TIMER_PERIOD_MILLI
+		);
+		call MilliTimer.startPeriodic(
+			TIMER_PERIOD_MILLI
+		);
     }
-    else {
-      call AMControl.start();
-    }
+	else {
+		call AMControl.start();
+	}
   }
 
   event void AMControl.stopDone(error_t err) {
@@ -66,8 +66,8 @@ implementation {
   }
     
   event void MilliTimer.fired() {
-  	val = call Random.rand16() % 11;
-    printf("Timer fired -> counter: %d.\n", val);
+  	val = call Random.rand16() % 101;
+    printf("Timer fired -> val: %d.\n", val);
     if (locked) {
       return;
     }
@@ -112,15 +112,12 @@ implementation {
   	FIXME counter should be a count of any message or only succesfully ones?
 	Update counter for each message received
 	*/
-    printf("Received packet of length %d.\n", len);
+    //printf("Received packet of length %d.\n", len);
     if (len != sizeof(mqtt_random_msg_t)) {return bufPtr;}
     else {
 
       mqtt_random_msg_t* rcm = (mqtt_random_msg_t*)payload;
-      printf("From MOTE %d -> Counter Received: %d\n", rcm->src, rcm->counter);
-
-      printf("  >> MOD10 -> %d\n", rcm->counter%10);
-      
+      printf("{\"moteId\": %d, \"value\": %d}\n", rcm->src, rcm->counter);      
       
       return bufPtr;
     }
