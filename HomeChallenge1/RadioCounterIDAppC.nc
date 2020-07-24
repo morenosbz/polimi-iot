@@ -4,18 +4,19 @@
 *	Components relationship
 */
  
+#define NEW_PRINTF_SEMANTICS
+#include "printf.h"
 #include "RadioCounterID.h"
 
 /**
-	TODO Update this
- * Configuration for the RadioCountToLeds application. RadioCountToLeds 
- * maintains a 4Hz counter, broadcasting its value in an AM packet 
- * every time it gets updated. A RadioCountToLeds node that hears a counter 
- * displays the bottom three bits on its LEDs. This application is a useful 
- * test to show that basic AM communication and timers work.
+ * Implementation of the RadioCounterID application. RadioCounterID 
+ * depending on the Mote id, the frequency is setted, 1Hz, 3Hz or 5Hz.
+ * Then a broadcast message is sent, with the source and the actual count.
+ * As a receiver, the mote identifies the source, toggle the corresponding LED
+ * and if the count is modulus 10, all the leds are turned off.
  *
- * @author Philip Levis
- * @date   June 6 2005
+ * @author D'introno, Moreno, Zaniolo
+ * @date   March 20 2020
  */
 
 configuration RadioCounterIDAppC {}
@@ -27,6 +28,12 @@ implementation {
   components new TimerMilliC() as Timer1;//new
   components new TimerMilliC() as Timer2; //new
   components ActiveMessageC;
+  
+  /*
+	Serial print components
+  */
+  components SerialPrintfC;
+  
   
   App.Boot -> MainC.Boot;
   

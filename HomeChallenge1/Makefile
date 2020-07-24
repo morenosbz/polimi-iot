@@ -1,4 +1,5 @@
 COMPONENT=RadioCounterIDAppC
+CFLAGS += -I$(TOSDIR)/lib/printf
 #BUILD_EXTRA_DEPS = RadioCountMsg.py RadioCountMsg.class
 #CLEAN_EXTRA = RadioCountMsg.py RadioCountMsg.class RadioCountMsg.java
 

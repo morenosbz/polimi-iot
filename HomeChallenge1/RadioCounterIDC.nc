@@ -4,19 +4,20 @@
 *	Interfaces implementation
 */
  
+#include "printf.h"
 #include "Timer.h"
 #include "RadioCounterID.h"
+#include "utils.c"
  
 /**
-	TODO Update this
- * Implementation of the RadioCountToLeds application. RadioCountToLeds 
- * maintains a 4Hz counter, broadcasting its value in an AM packet 
- * every time it gets updated. A RadioCountToLeds node that hears a counter 
- * displays the bottom three bits on its LEDs. This application is a useful 
- * test to show that basic AM communication and timers work.
+ * Implementation of the RadioCounterID application. RadioCounterID 
+ * depending on the Mote id, the frequency is setted, 1Hz, 3Hz or 5Hz.
+ * Then a broadcast message is sent, with the source and the actual count.
+ * As a receiver, the mote identifies the source, toggle the corresponding LED
+ * and if the count is modulus 10, all the leds are turned off.
  *
- * @author Philip Levis
- * @date   June 6 2005
+ * @author D'introno, Moreno, Zaniolo
+ * @date   March 20 2020
  */
 
 module RadioCounterIDC @safe() {
@@ -31,8 +32,7 @@ module RadioCounterIDC @safe() {
     interface Boot;
     
     interface Timer<TMilli> as MilliTimer;
-    interface SplitControl as AMControl;	// Control interface
-    
+    interface SplitControl as AMControl;	// Control interface    
   }
 }
 implementation {
@@ -40,8 +40,7 @@ implementation {
   message_t packet;
 
   bool locked;
-  uint16_t counter = 0;
-	
+  uint16_t msgCounter = 0;
 	/*
 		SEND
 	*/
@@ -53,9 +52,18 @@ implementation {
     call Timer2.startPeriodic( 200 );		//timer2 5Hz->mote3
   }
 
-  event void AMControl.startDone(error_t err) {		//start RADIO
+
+  event void AMControl.startDone(error_t err) {
+  	printf(
+  		"Mote: %d - Period: %d ms.\n",
+  		TOS_NODE_ID,
+  		getPeriodFromID(TOS_NODE_ID)
+	);
+
     if (err == SUCCESS) {
-      call MilliTimer.startPeriodic(250);
+      call MilliTimer.startPeriodic(
+		getPeriodFromID(TOS_NODE_ID)
+      );
     }
     else {
       call AMControl.start();
@@ -65,63 +73,32 @@ implementation {
   event void AMControl.stopDone(error_t err) {
     // do nothing
   }
-  
-
-
-
-
-
-  event void Timer0.fired() {			//new
-    counter++;
-    dbg("RadioCountToLedsC", "RadioCountToLedsC: timer fired, counter is %hu.\n", counter);
+    
+  event void MilliTimer.fired() {
+    printf("Timer fired -> counter: %d.\n", msgCounter);
     if (locked) {
       return;
     }
     else {
     	/*
-    	TODO Create and set message
+			Create and set message
     	*/
-	  radio_count_msg_t* rcm = (radio_count_msg_t*)call Packet.getPayload(&packet, sizeof(radio_count_msg_t));
+	  id_count_msg_t* rcm = (id_count_msg_t*)call Packet.getPayload(&packet, sizeof(id_count_msg_t));
       if (rcm == NULL) {
 		return;
       }
 
-      rcm->counter = counter;
-      rcm->senderID = TOS_NODE_ID;	//check
-      /*
-      	Send message
-      */
-      if (call AMSend.send(AM_BROADCAST_ADDR, &packet, sizeof(radio_count_msg_t)) == SUCCESS) {
-		dbg("RadioCountToLedsC", "RadioCountToLedsC: packet sent.\n", counter);	
-		locked = TRUE;
-      }
-    }
-  }
-
-
- event void Timer1.fired() {			//new
-    counter++;
-    dbg("RadioCountToLedsC", "RadioCountToLedsC: timer fired, counter is %hu.\n", counter);
-    if (locked) {
-      return;
-    }
-    else {
-    	/*
-    	TODO Create and set message
+		/*
+			Fill message
+		*/
+		
+      rcm->counter = msgCounter;
+      rcm->src = TOS_NODE_ID;
+	    /*
+			Send message
     	*/
-	  radio_count_msg_t* rcm = (radio_count_msg_t*)call Packet.getPayload(&packet, sizeof(radio_count_msg_t));
-      if (rcm == NULL) {
-		return;
-      }
-
-      rcm->counter = counter;
-      rcm->sendID = TOS_NODE_ID;
-      
-      /*
-      	Send message
-      */
-      if (call AMSend.send(AM_BROADCAST_ADDR, &packet, sizeof(radio_count_msg_t)) == SUCCESS) {
-		dbg("RadioCountToLedsC", "RadioCountToLedsC: packet sent.\n", counter);	
+      if (call AMSend.send(AM_BROADCAST_ADDR, &packet, sizeof(id_count_msg_t)) == SUCCESS) {
+		printf("MSG SENT: %d\n", msgCounter);	
 		locked = TRUE;
       }
     }
@@ -176,25 +153,36 @@ implementation {
   
   
   event message_t* Receive.receive(message_t* bufPtr, void* payload, uint8_t len) {
-    dbg("RadioCountToLedsC", "Received packet of length %hhu.\n", len);
-    if (len != sizeof(radio_count_msg_t)) {return bufPtr;}
+  	/*
+  	FIXME counter should be a count of any message or only succesfully ones?
+	Update counter for each message received
+	*/
+      msgCounter++;
+    printf("Received packet of length %d.\n", len);
+    if (len != sizeof(id_count_msg_t)) {return bufPtr;}
     else {
-      radio_count_msg_t* rcm = (radio_count_msg_t*)payload;
-      if (rcm->sendID == 1) {			// se il messaggio proviene da mote1->toggle led0
-		call Leds.led0Toggle();		// se il messaggio proviene da mote2->toggle led1
-      }						// se il messaggio proviene da mote3->toggle led2
-      						// se il messaggio contiene count % 10==0->turn off
-      if (rcm->sendID == 2) {
-		call Leds.led1Toggle();
-      }
-      if (rcm->sendID == 3) {
-		call Leds.led2Toggle();
-      }
-      if (rcm->count % 10 == 0) {
-		call Leds.led0Off();
+
+      id_count_msg_t* rcm = (id_count_msg_t*)payload;
+      printf("From MOTE %d -> Counter Received: %d\n", rcm->src, rcm->counter);
+
+      printf("  >> MOD10 -> %d\n", rcm->counter%10);
+      if(rcm->counter % 10 == 0){
+      	printf("    >> MOD10 -> TURNOFF NOW\n");
+		call Leds.led0Off();      	
 		call Leds.led1Off();
 		call Leds.led2Off();
+      } else {
+		  if(rcm->src == 1){
+	  	    call Leds.led0Toggle();
+		  }
+		  if(rcm->src == 2){
+	  	    call Leds.led1Toggle();
+		  }
+		  if(rcm->src == 3){
+	  	    call Leds.led2Toggle();
+		  }
       }
+      
       return bufPtr;
     }
   }
