@@ -2,6 +2,7 @@
 *	Politecnico di Milano
 *	IoT - Home Challenge 1
 *	Message structure
+*
 */
 
 #ifndef RADIO_COUNTER_ID_H
@@ -10,6 +11,9 @@
 typedef nx_struct id_count_msg {
   nx_uint16_t src;			// Source (sender) Mote
   nx_uint16_t counter;		// Counter value
+  nx_uint16_t senderID;		//new
+} radio_count_msg_t;
+
 } id_count_msg_t;
 
 enum {

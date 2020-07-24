@@ -23,10 +23,10 @@
 module RadioCounterIDC @safe() {
   uses {
 
-  	interface AMSend; 		// Sender Component
+    interface AMSend; 		// Sender Component
     interface Receive;		// Receiver Component
     
-  	interface Packet;		// Message manipulator
+    interface Packet;		// Message manipulator
   	
     interface Leds;
     interface Boot;
@@ -47,7 +47,11 @@ implementation {
   
   event void Boot.booted() {
     call AMControl.start();
+    call Timer0.startPeriodic( 1000 );		//timer0 1Hz->mote1
+    call Timer1.startPeriodic( 333 );		//timer1 3Hz->mote2
+    call Timer2.startPeriodic( 200 );		//timer2 5Hz->mote3
   }
+
 
   event void AMControl.startDone(error_t err) {
   	printf(
@@ -55,7 +59,7 @@ implementation {
   		TOS_NODE_ID,
   		getPeriodFromID(TOS_NODE_ID)
 	);
-	
+
     if (err == SUCCESS) {
       call MilliTimer.startPeriodic(
 		getPeriodFromID(TOS_NODE_ID)
@@ -100,11 +104,48 @@ implementation {
     }
   }
 
+
+ event void Timer2.fired() {			//new
+    counter++;
+    dbg("RadioCountToLedsC", "RadioCountToLedsC: timer fired, counter is %hu.\n", counter);
+    if (locked) {
+      return;
+    }
+    else {
+    	/*
+    	TODO Create and set message
+    	*/
+	  radio_count_msg_t* rcm = (radio_count_msg_t*)call Packet.getPayload(&packet, sizeof(radio_count_msg_t));
+      if (rcm == NULL) {
+		return;
+      }
+
+      rcm->counter = counter;
+      rcm->sendID=TOS_NODE_ID;
+      /*
+      	Send message
+      */
+      if (call AMSend.send(AM_BROADCAST_ADDR, &packet, sizeof(radio_count_msg_t)) == SUCCESS) {
+		dbg("RadioCountToLedsC", "RadioCountToLedsC: packet sent.\n", counter);	
+		locked = TRUE;
+      }
+    }
+  }
+
+
+
+
+
   event void AMSend.sendDone(message_t* bufPtr, error_t error) {
     if (&packet == bufPtr) {
       locked = FALSE;
     }
   }
+
+
+
+
+
   
   	/*
   		RECEIVE
