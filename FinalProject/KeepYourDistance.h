@@ -8,8 +8,9 @@
 #define KEEP_YOUR_DISTANCE_H
 
 typedef nx_struct kyd_msg {
-    nx_uint16_t src;        // Source (sender) Mote
-        // Counter value
+    nx_uint16_t near;        // Near Mote
+    nx_uint16_t src;
+        
 }
 kyd_msg_t;
 

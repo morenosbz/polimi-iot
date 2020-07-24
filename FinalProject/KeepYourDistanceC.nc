@@ -82,7 +82,7 @@ implementation {
             */
 
             
-            rcm-> src = TOS_NODE_ID;
+            rcm-> near = TOS_NODE_ID;
             /*
 			        Send message
     	      */
@@ -109,7 +109,8 @@ implementation {
             return bufPtr;
         } else {
             kyd_msg_t * rcm = (kyd_msg_t * ) payload;
-            printf("{\"moteId\": %d}\n", rcm-> src);
+            rcm-> src = TOS_NODE_ID;
+            printf("{\"moteId_near\": %d,\"moteId_src\" : %d}\n", rcm-> near,rcm->src);
 
             return bufPtr;
         }
