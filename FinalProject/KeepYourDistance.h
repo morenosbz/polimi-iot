@@ -9,7 +9,7 @@
 
 typedef nx_struct kyd_msg {
     nx_uint16_t near;        // Near Mote
-    nx_uint16_t src;
+    nx_uint16_t src;		 // Sender Mote
         
 }
 kyd_msg_t;

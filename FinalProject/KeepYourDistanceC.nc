@@ -45,7 +45,7 @@ implementation {
 
     event void AMControl.startDone(error_t err) {
 
-        if (err == SUCCESS && TOS_NODE_ID > 1) {
+        if (err == SUCCESS && TOS_NODE_ID > 0) {
             printf(
                 "Mote: %d - Period: %d ms.\n",
                 TOS_NODE_ID,
